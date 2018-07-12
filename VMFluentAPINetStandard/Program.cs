@@ -124,33 +124,8 @@ namespace ManageVirtualMachine
 
                 Utilities.Log("Powering OFF VM: " + windowsVM.Id);
 
-                windowsVM.PowerOff();
-
                 Utilities.Log("Powered OFF VM: " + windowsVM.Id + "; state = " + windowsVM.PowerState);
 
-                // Get the network where Windows VM is hosted
-                var network = windowsVM.GetPrimaryNetworkInterface().PrimaryIPConfiguration.GetNetwork();
-
-                //=============================================================
-                // Create a Linux VM in the same virtual network
-
-                Utilities.Log("Creating a Linux VM in the network");
-
-                var linuxVM = azure.VirtualMachines.Define(linuxVmName)
-                        .WithRegion(region)
-                        .WithExistingResourceGroup(rgName)
-                        .WithExistingPrimaryNetwork(network)
-                        .WithSubnet("subnet1") // Referencing the default subnet name when no name specified at creation
-                        .WithPrimaryPrivateIPAddressDynamic()
-                        .WithoutPrimaryPublicIPAddress()
-                        .WithPopularLinuxImage(KnownLinuxVirtualMachineImage.UbuntuServer16_04_Lts)
-                        .WithRootUsername(userName)
-                        .WithRootPassword(password)
-                        .WithSize(VirtualMachineSizeTypes.StandardD3V2)
-                        .Create();
-
-                Utilities.Log("Created a Linux VM (in the same virtual network): " + linuxVM.Id);
-                Utilities.PrintVirtualMachine(linuxVM);
 
                 //=============================================================
                 // List virtual machines in the resource group
@@ -164,13 +139,10 @@ namespace ManageVirtualMachine
                     Utilities.PrintVirtualMachine(virtualMachine);
                 }
 
-                //=============================================================
-                // Delete the virtual machine
-                Utilities.Log("Deleting VM: " + windowsVM.Id);
-
-                azure.VirtualMachines.DeleteById(windowsVM.Id);
-
-                Utilities.Log("Deleted VM: " + windowsVM.Id);
+            }
+            catch(Exception exc)
+            {
+                Utilities.Log(exc.ToString());
             }
             finally
             {
@@ -197,6 +169,13 @@ namespace ManageVirtualMachine
             {
                 //=============================================================
                 // Authenticate
+                //warservprin
+                //gr4tdsDgz9fk
+                /*
+                 * DisplayName    ApplicationId
+                   -----------    -------------
+                MachineStarter 037b1284-c2e1-440c-a41e-0b7b03d87a8e*/
+
                 var credentials = SdkContext.AzureCredentialsFactory.FromFile(Environment.GetEnvironmentVariable("AZURE_AUTH_LOCATION"));
 
                 var azure = Azure
